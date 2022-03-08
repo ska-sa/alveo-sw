@@ -1,0 +1,6 @@
+This repo contains git submodules and thus an extra
+few step are required to "pull" these repos in after
+cloning:
+
+$ git submodule init
+$ git submodule update
