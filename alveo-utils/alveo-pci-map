@@ -1,0 +1,77 @@
+#!/bin/bash
+
+#RvW, SARAO, 2022
+
+
+function print_usage_exit() {
+	echo "usage: ${0} [--help] [--dev <xdma|xrt|all>]"
+	exit
+}
+
+
+
+#parse cmd line args
+while test ! -z $1; do
+  case $1 in
+#  "--force")
+#          force=1
+#          ;;
+  "--dev")
+          shift
+          test -z $1 && print_usage_exit
+          test $1 = "xdma" || test $1 = "xrt" || test $1 = "all" || print_usage_exit
+	  #xdma => custom builds using the xdma pcie device
+	  #xrt => alveos running the Xilinx XRT shell
+	  #all => find both xdma and xrt shell
+          dev_opt=$1
+          ;;
+  *)
+          print_usage_exit
+          ;;
+
+  esac
+  shift
+done
+
+
+#if unset, set to "xdma" -> ie when no arg set on cmd line
+dev_opt=${dev_opt:-"xdma"}
+
+if test $dev_opt = "xdma"; then
+	SRC_DEV="xdma.*user"
+elif test $dev_opt = "xrt"; then
+	SRC_DEV="xclmgmt"
+elif test $dev_opt = "all"; then
+	SRC_DEV="xdma.*user|xclmgmt"
+fi
+
+
+
+DEVS=$(ls -l /sys/dev/char/ | grep -E ${SRC_DEV} | rev | cut -f1,3 -d'/' | rev)
+
+
+#for i in ${DEVS}; do
+#	PCI_SLOT_ADDR=$(echo $i | cut -f1 -d'/')
+#	MEMSIZE=$(( $(cat /sys/bus/pci/devices/${PCI_SLOT_ADDR}/resource | head -n1 | cut -f1,2 -d' ' | awk '{ print $2 " " $1}' | tr ' ' '-') + 1))
+#	MEMSIZE_HUMANREAD=$(numfmt --to=iec-i --suffix=B ${MEMSIZE})
+#	printf "PCI Device @ %s\n"  ${i}
+#	printf "Region0 mem-size %s\n"  ${MEMSIZE_HUMANREAD} 
+#done
+
+
+for i in ${DEVS}; do
+	INDEX=0
+	printf "PCI Device @ %s\n"  ${i}
+	PCI_SLOT_ADDR=$(echo $i | cut -f1 -d'/')
+	printf "ID %s\n" $(cat /sys/bus/pci/devices/${PCI_SLOT_ADDR}/device)
+	#read in resource file line-by-line:
+	while read -r line; do
+		#echo "$line";
+		MEMSIZE=$(( $(echo "${line}" | cut -f1,2 -d' ' | awk '{ print $2 " " $1}' | tr ' ' '-') ));
+		if test ${MEMSIZE} -ne 0; then
+			MEMSIZE_HUMANREAD=$(numfmt --to=iec-i --suffix=B ${MEMSIZE});
+			printf "Region%d mem-size %s\n"  ${INDEX} ${MEMSIZE_HUMANREAD};
+		fi
+		INDEX=$((INDEX + 1));
+	done < /sys/bus/pci/devices/${PCI_SLOT_ADDR}/resource
+done
