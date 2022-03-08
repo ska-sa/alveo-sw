@@ -1,3 +1,9 @@
 [submodule "katcp"]
 	path = katcp
 	url = /home/kat/robin/katcp/
+[submodule "dma_ip_drivers"]
+	path = dma_ip_drivers
+	url = https://github.com/Xilinx/dma_ip_drivers
+[submodule "pcimem"]
+	path = pcimem
+	url = https://github.com/billfarrow/pcimem.git
