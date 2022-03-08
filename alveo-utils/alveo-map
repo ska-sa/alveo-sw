@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ALVEOS=$(./alveo-pci | grep PCI | cut -d'@' -f 2)
+
+for DEVICE in $ALVEOS; do
+  SER=$(./alveo-serial /dev/$(echo ${DEVICE} | cut -d'/' -f2))
+  echo "${DEVICE}/${SER}"
+done
+

@@ -1,0 +1,38 @@
+#!/usr/bin/sudo bash
+
+#check for an argument
+test -z $1 && echo "need a device" && exit
+
+#check that the arg exists and is an xdma char device
+test ! -c $1 && echo "need a valid char device" && exit
+
+#TODO crude implementation for now, should probably do more
+#sanity and error checking
+
+#check out the CMS app note...
+
+#TODO doing blind writes here not the best, first have to make sure that
+#the memory offset is indeed correct
+../pcimem/pcimem ${1} 0x20000 w 1 > /dev/null 2>&1
+
+../pcimem/pcimem ${1} 0x29000 w 0x04000000 > /dev/null 2>&1
+
+../pcimem/pcimem ${1} 0x28018 w 0x20 > /dev/null 2>&1
+
+
+DATA=$(I=10; ../pcimem/pcimem ${1} 0x29004 w*${I} | tail -n ${I} | cut -d' ' -f 2 | cut -d'x' -f2 | sed 's/.\{2\}/& /g' | awk -F' ' '{print $4" "$3" " $2" "$1}' | tr '\n' ' ')
+
+#get everything after serial number identifier "21 0d"
+SUBSTRING=${DATA#*"21 0D"}
+
+#read the next 12 octets and convert to ascii from hex
+index=0;
+for oct in ${SUBSTRING}; do
+   echo $oct | xxd -r -p;
+    index=$((index+1));
+    if [[ $index -eq 12 ]]; then
+      break;
+    fi;
+done;
+
+echo

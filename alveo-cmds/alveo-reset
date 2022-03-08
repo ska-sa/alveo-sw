@@ -1,0 +1,39 @@
+#!/usr/bin/sudo bash
+
+#!/bin/bash
+
+#RvW, SARAO, 2022
+
+
+function print_usage_exit() {
+	echo "usage: ${0} [--help] [--pci ADDR]"
+	exit
+}
+
+pci_addr=""
+
+#parse cmd line args
+while test ! -z $1; do
+  case $1 in
+  "--pci")
+          shift
+          test -z $1 && print_usage_exit
+          pci_addr=$1
+          ;;
+  *)
+          print_usage_exit
+          ;;
+
+  esac
+  shift
+done
+
+
+if test -z $pci_addr; then
+	print_usage_exit
+fi
+
+
+
+#test -e /sys/bus/pci/devices/0000:0f:00.0/remove && echo 1 > /sys/bus/pci/devices/0000:0f:00.0/remove && sleep 1 && echo 1 > /sys/bus/pci/rescan
+test -e /sys/bus/pci/devices/${pci_addr}/remove && echo 1 > /sys/bus/pci/devices/${pci_addr}/remove && sleep 1 && echo 1 > /sys/bus/pci/rescan

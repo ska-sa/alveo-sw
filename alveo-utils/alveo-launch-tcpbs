@@ -1,0 +1,22 @@
+#!/usr/bin/sudo bash
+
+set -e
+
+echo "WARNING: starting with root permissions!!"
+
+base_port=7150
+
+#export PATH=$PATH:$(pwd)
+
+ALVEOS=$(./alveo-map)
+
+port=${base_port}
+
+for CARD in ${ALVEOS}; do
+  PCIADDR=$(echo ${CARD} | cut -d'/' -f1)
+  DEVICE=$(echo ${CARD} | cut -d'/' -f2)
+  SERIAL=$(echo ${CARD} | cut -d'/' -f3)
+  echo $PCIADDR $DEVICE $SERIAL
+  ../katcp/tcpborphserver3/tcpborphserver3 -p ${port} -l /dev/null -i init-alveo.tbs -d /dev/xdma0_user -u $((port+1))
+  port=$((port+2))
+done
