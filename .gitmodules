@@ -1,0 +1,3 @@
+[submodule "katcp"]
+	path = katcp
+	url = /home/kat/robin/katcp/
