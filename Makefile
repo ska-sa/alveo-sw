@@ -1,11 +1,17 @@
 TBSFS="/tmp/alveo/alveo-tcpbs-fs/"
 UDEVPATH="/etc/udev/rules.d/"
 PREFIX=usr/local
+EXISTS=$(shell test -e ./alveo-linux-env/xdma-udev-rules/60-xdma.rules || echo 'NO')
 
-install: .tcpborphserver3_install .kcpfpg_install .kcpcmd_install
+install: .check .tcpborphserver3_install .kcpfpg_install .kcpcmd_install
 	@test -d ${TBSFS} || mkdir -p ${TBSFS}
 	@cp -i ./alveo-tcpbs-fs/* ${TBSFS}
 	@cp -i ./alveo-linux-env/xdma-udev-rules/60-xdma.rules ./alveo-linux-env/xdma-udev-rules/alveo_namer.sh ${UDEVPATH}
+
+.check: .FORCE
+ifeq ("$(EXISTS)","NO")
+	$(error "First run ./configure to set up environment")
+endif
 
 .tcpborphserver3_install: katcp
 	prefix=${PREFIX} ${MAKE} -C katcp/tcpborphserver3/ install
@@ -35,4 +41,6 @@ uninstall: .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
 
 
 
-.PHONY: .katcp_install .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
+.PHONY: .check .katcp_install .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
+
+.FORCE:
