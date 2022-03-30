@@ -23,9 +23,9 @@ for PCIE_ADDR in ${DEVS}; do
   ALVEO_TYPE=${ALVEO_TYPE:-"alveo"}
   #now try to get the actual type
   DEV_ID=$(cat /sys/bus/pci/devices/${PCIE_ADDR}/device 2>/dev/null)
-  if test ${DEV_ID} = "0x500c"; then
+  if test ${DEV_ID} = "0x5020"; then
     ALVEO_TYPE="u50";
-  elif test ${DEV_ID} = "0xd020"; then
+  elif test ${DEV_ID} = "0x500c"; then
     ALVEO_TYPE="u280";
   else
     ALVEO_TYPE="alveo";
