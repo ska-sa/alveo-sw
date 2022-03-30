@@ -1,0 +1,27 @@
+#!/usr/bin/sudo bash
+#NOTE: cannot call this utility 'reset', that already exists as a bash utility 
+
+set -e
+
+#first have to identify which tcpborphserver called this funtion
+#because we need to get the associated pci address
+
+#take my PPID and search for it's PPID = grandparent pid
+GRANDPARENT_PID=$(ps -fp $PPID | awk "/$PPID/"' { print $3 } ')
+ARGS=$(ps -o args -p ${GRANDPARENT_PID})
+#TODO the line below has a potential bug - if the process
+#was started without a space before the arg, this may lead to issue with cut's space delimiter
+#check this i.e. there will be no space e.g. -d/dev/...
+DEVICE=$(echo ${ARGS#*"-d"} | tr -s ' '| cut -d ' ' -f1)
+
+kcpmsg ${DEVICE}
+
+#remove substring "user" to get path
+PCIPATH=${DEVICE%"user"}
+
+kcpmsg "about to reset alveo at ${PCIPATH}"
+
+test -e ${PCIPATH}/pci/remove && echo 1 > ${PCIPATH}/pci/remove && sleep 1 && echo 1 > /sys/bus/pci/rescan
+
+#exit 0
+#do not exit with 0, this allows failed test -e to push 1 back to caller
