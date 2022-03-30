@@ -1,0 +1,24 @@
+#RvW, 2022, SARAO
+
+# arg %k is the kernel given name for the device file
+#works KERNEL=="xdma[0-9]*", KERNELS=="0000:0f:00.0", PROGRAM="/etc/udev/rules.d/alveo_namer.sh %k", RUN+="/bin/ln -f -s /sys/bus/pci/devices/0000:0f:00.0/ /dev/xdma/u50_0/pci", SYMLINK+="xdma/u50_0/%c",  MODE="0666"
+#calling exe not working
+#KERNEL=="xdma[0-9]*", KERNELS=="0000:0f:00.0", PROGRAM="/etc/udev/rules.d/alveo_namer.sh %k", RUN+="/etc/udev/rules.d/alveo_dev_sym.sh u50_0 0000\:0f\:00.0", SYMLINK+="xdma/u50_0/%c",  MODE="0666"
+
+KERNEL=="xdma[0-9]*", KERNELS=="0000:0f:00.0", PROGRAM="/etc/udev/rules.d/alveo_namer.sh %k", SYMLINK+="xdma/u50_0/%c",  MODE="0666"
+#only need to do the following actions one, so only perform on xdma*_user invocation
+KERNEL=="xdma[0-9]_user", KERNELS=="0000:0f:00.0", ACTION=="add", RUN+="/bin/ln -f -s /sys/bus/pci/devices/0000:0f:00.0/ /dev/xdma/u50_0/pci"
+KERNEL=="xdma[0-9]_user", KERNELS=="0000:0f:00.0", ACTION=="remove", RUN+="/bin/rm /dev/xdma/u50_0/pci"
+
+
+KERNEL=="xdma[0-9]*", KERNELS=="0000:0d:00.0", PROGRAM="/bin/bash /etc/udev/rules.d/alveo_namer.sh %k", SYMLINK+="xdma/u50_1/%c",  MODE="0666"
+KERNEL=="xdma[0-9]_user", KERNELS=="0000:0d:00.0", ACTION=="add", RUN+="/bin/ln -f -s /sys/bus/pci/devices/0000:0d:00.0/ /dev/xdma/u50_1/pci"
+KERNEL=="xdma[0-9]_user", KERNELS=="0000:0d:00.0", ACTION=="remove", RUN+="/bin/rm /dev/xdma/u50_1/pci"
+
+
+KERNEL=="xdma[0-9]*", KERNELS=="0000:0e:00.0", PROGRAM="/bin/bash /etc/udev/rules.d/alveo_namer.sh %k", SYMLINK+="xdma/u50_2/%c",  MODE="0666"
+KERNEL=="xdma[0-9]_user", KERNELS=="0000:0e:00.0", ACTION=="add", RUN+="/bin/ln -f -s /sys/bus/pci/devices/0000:0e:00.0/ /dev/xdma/u50_2/pci"
+KERNEL=="xdma[0-9]_user", KERNELS=="0000:0e:00.0", ACTION=="remove", RUN+="/bin/rm /dev/xdma/u50_2/pci"
+
+#TODO remove broken links after alveos are removed, xdma driver unloaded
+#TODO find a way to dynamically pass in the pci addr (?)
