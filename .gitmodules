@@ -7,3 +7,6 @@
 [submodule "pcimem"]
 	path = pcimem
 	url = https://github.com/billfarrow/pcimem.git
+[submodule "alveo_sensmon"]
+	path = alveo_sensmon
+	url = https://github.com/mchirindo/alveo_sensmon.git
