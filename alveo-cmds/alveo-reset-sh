@@ -1,9 +1,10 @@
 #!/usr/bin/sudo bash
 
-#!/bin/bash
-
 #RvW, SARAO, 2022
 
+#utility to be run from bash cmd line, as opposed
+#to alveo-reset which is to be run from tcpbs as
+#a registered process
 
 function print_usage_exit() {
 	echo "usage: ${0} [--help] [--pci ADDR]"
