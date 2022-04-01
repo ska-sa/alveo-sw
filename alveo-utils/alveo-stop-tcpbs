@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#RvW, SARAO, 2022
+
+PIDS=$(ps fax | grep [t]cpborphserver3 | tr -s ' ' | cut -d' ' -f2)
+
+for P in ${PIDS}; do
+  echo $(ps -o args -p ${P})
+
+#TODO the line below has a potential bug - if the process
+#was started **without** a space before the arg, this may lead to issue with cut's space delimiter
+#check this i.e. there will be no space e.g. -p7150
+
+  PORT=$(echo ${ARGS#*"-p"} | tr -s ' '| cut -d ' ' -f1)
+  kcpcmd -s :${PORT} halt
+done
