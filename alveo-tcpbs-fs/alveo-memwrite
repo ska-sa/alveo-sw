@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#the inform must have the same name as the process for tcpbs to "catch" it
+
+set -x
+set -e
+
+HEX1=$(echo $1 | cut -f2 -d'x')
+HEX2=$(echo $2 | cut -f2 -d'x')
+
+#check if arg 1 is a hex value
+#let 16#${HEX} 2>/dev/null || exit -3
+test ${HEX} -eq 0 2>/dev/null || let 16#${HEX1} 2>/dev/null
+
+##check that arg 2 is an integer
+#test -n "$2"
+#test $2 -eq $2 2>/dev/null
+
+#check if arg 2 is a hex value
+test ${HEX} -eq 0 2>/dev/null || let 16#${HEX2} 2>/dev/null
+
+PARENT_PID=$(ps -fp $PPID | awk "/$PPID/"' { print $2 } ')
+#PARENT_PID=10823
+
+ARGS=$(ps -o args -p ${PARENT_PID})
+DEVICE=$(echo ${ARGS#*"-d"} | xargs | cut -d ' ' -f1)
+
+
+OUTPUT=$(pcimem ${DEVICE} $1 w $2 2>/dev/null)
+
+DATA=$(echo ${OUTPUT} | awk 'END{print}' | tr -d ' ' | cut -f2 -d';')
+
+DATA=${DATA/readback/}
+echo $DATA
+
+test -n "${DATA}"
+test "${DATA^^}" = "${2^^}"
+
+
+echo "#alveo-memwrite $1 $2"
+exit 0 
+

@@ -6,9 +6,16 @@ set -e
 
 echo "WARNING: starting with root permissions!!"
 
+#test dependencies (set -e will catch failures)
+which tcpborphserver3 || (>&2 echo "missing dependencies - tcpborphserver"; exit 1)
+which kcpcmd || (>&2 echo "missing dependencies - kcpcmd"; exit 1)
+which kcpfpg || (>&2 echo "missing dependencies - kcpfpg"; exit 1)
+test -d /opt/alveo/alveo-tcpbs-fs/ || (>&2 echo "missing dependencies - /opt/alveo/alveo-tcpbs-fs/"; exit 1)
+
 BASE_PORT=7150
-#BOF_DIR="/opt/alveo/alveo-fs/"
-BOF_DIR="../alveo-tcpbs-fs/"
+BOF_DIR="/opt/alveo/alveo-tcpbs-fs/"
+#BOF_DIR="../alveo-tcpbs-fs/"
+CFGPATH="/lib/firmware/tcpborphserver.bit"
 
 #export PATH=$PATH:$(pwd)
 export PATH=$PATH:$(pwd):${BOF_DIR}
@@ -23,12 +30,17 @@ for CARD in ${ALVEOS}; do
   SERIAL=$(./alveo-serial /dev/xdma/${CARD}/user 2>/dev/null)
   echo $CARD $SERIAL
   #../katcp/tcpborphserver3/tcpborphserver3 -p ${PORT} -l /dev/null -i init-alveo.tbs -d /dev/xdma/${CARD}/user -u $((PORT+1))
-  ../katcp/tcpborphserver3/tcpborphserver3 -p ${PORT} -l /dev/null -b ${BOF_DIR} -d /dev/xdma/${CARD}/user -u $((PORT+1))
+  env PATH=$PATH:$(pwd):${BOF_DIR} tcpborphserver3 -p ${PORT} -l /dev/null -b ${BOF_DIR} -d /dev/xdma/${CARD}/user -u $((PORT+1)) -c ${CFGPATH}
 
   #TODO should we wait a bit here?
   sleep 0.5
-  ../katcp/cmd/kcpcmd -s localhost:${PORT} version add alveo ${CARD} ${SERIAL}
-  ../katcp/cmd/kcpcmd -s localhost:${PORT} process alveo-reset reset\_this\_alveo
+#  kcpcmd -s localhost:${PORT} version add alveo ${CARD} ${SERIAL}
+  kcpcmd -s localhost:${PORT} version add alveo-card ${CARD}
+  kcpcmd -s localhost:${PORT} version add alveo-serial ${SERIAL}
+  kcpcmd -s localhost:${PORT} process alveo-reset reset\_this\_alveo
+  kcpcmd -s localhost:${PORT} process alveo-program program\_this\_alveo
+  kcpcmd -s localhost:${PORT} process alveo-memread read\_from\_a\_hex\_valued\_absolute\_address
+  kcpcmd -s localhost:${PORT} process alveo-memwrite write\_to\_a\_hex\_valued\_absolute\_address
 
   PORT=$((PORT+2))
 done

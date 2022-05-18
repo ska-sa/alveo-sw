@@ -2,6 +2,8 @@
 
 #RvW, SARAO, 2022
 
+#PCIMEM_PATH="../pcimem/"
+
 #check for an argument
 test -z $1 && echo "need a device" 1>&2 && exit
 
@@ -15,14 +17,17 @@ test ! -c $1 && echo "need a valid char device" 1>&2 && exit
 
 #TODO doing blind writes here not the best, first have to make sure that
 #the memory offset is indeed correct
-../pcimem/pcimem ${1} 0x20000 w 1 > /dev/null 2>&1
-sleep 0.5
-../pcimem/pcimem ${1} 0x29000 w 0x04000000 > /dev/null 2>&1
-sleep 0.5
-../pcimem/pcimem ${1} 0x28018 w 0x20 > /dev/null 2>&1
+
+#ensure CMS subsystem out of reset first
+${PCIMEM_PATH}pcimem ${1} 0x20000 w 1 > /dev/null 2>&1
 sleep 0.5
 
-DATA=$(I=10; ../pcimem/pcimem ${1} 0x29004 w*${I} | tail -n ${I} | cut -d' ' -f 2 | cut -d'x' -f2 | sed 's/.\{2\}/& /g' | awk -F' ' '{print $4" "$3" " $2" "$1}' | tr '\n' ' ')
+${PCIMEM_PATH}pcimem ${1} 0x29000 w 0x04000000 > /dev/null 2>&1
+sleep 0.5
+${PCIMEM_PATH}pcimem ${1} 0x28018 w 0x20 > /dev/null 2>&1
+sleep 0.5
+
+DATA=$(I=10; ${PCIMEM_PATH}pcimem ${1} 0x29004 w*${I} | tail -n ${I} | cut -d' ' -f 2 | cut -d'x' -f2 | sed 's/.\{2\}/& /g' | awk -F' ' '{print $4" "$3" " $2" "$1}' | tr '\n' ' ')
 
 #get everything after serial number identifier "21 0d"
 SUBSTRING=${DATA#*"21 0D"}

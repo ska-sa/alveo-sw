@@ -15,10 +15,13 @@ rm "$tmpfile"
 
 
 #find any installed xilinx alveo cards in pcie slots - either running the shell xrt or the xdma
-DEVS=$(ls -l /sys/dev/char/ | grep -E ${SRC_DEV} | rev | cut -f3 -d'/' | rev)
+DEVS=$(ls -l /sys/dev/char/ 2>/dev/null | grep -E ${SRC_DEV} 2>/dev/null | rev | cut -f3 -d'/' | rev)
 INDEX=0
 
+test -z "${DEVS}" && echo "No alveos found. Ensure Xilinx XRT is installed" && exec 3>&- && exec 4>&- && exit
+
 for PCIE_ADDR in ${DEVS}; do
+  echo -n ${PCIE_ADDR}
   #if type unset, set default to general 'alveo' type
   ALVEO_TYPE=${ALVEO_TYPE:-"alveo"}
   #now try to get the actual type
@@ -31,6 +34,8 @@ for PCIE_ADDR in ${DEVS}; do
     ALVEO_TYPE="alveo";
   fi
 
+  echo " ${ALVEO_TYPE}"
+
   echo "#alveo_${INDEX}" >&3
   echo "KERNEL==\"xdma\[0-9\]*\", KERNELS==\"${PCIE_ADDR}\", PROGRAM=\"/etc/udev/rules.d/alveo_namer.sh %k\", SYMLINK+=\"xdma/alveo_${INDEX}_${ALVEO_TYPE}/%c\",  MODE=\"0666\"" >&3
   echo "KERNEL==\"xdma\[0-9\]_user\", KERNELS==\"${PCIE_ADDR}\", ACTION==\"add\", RUN+=\"/bin/ln -f -s /sys/bus/pci/devices/${PCIE_ADDR}/ /dev/xdma/alveo_${INDEX}_${ALVEO_TYPE}/pci\"" >&3
@@ -40,10 +45,11 @@ for PCIE_ADDR in ${DEVS}; do
 done
 
 
-#create Makefile.inc if it doesn't exist
-#touch "./60-xdma.rules"
 UDEV_OUTPUT_PATH=./alveo-linux-env/xdma-udev-rules
 test -e ${UDEV_OUTPUT_PATH}/60-xdma.rules && cp --backup=t ${UDEV_OUTPUT_PATH}/60-xdma.rules ${UDEV_OUTPUT_PATH}/60-xdma.rules.bak
+
+#create Makefile.inc if it doesn't exist
+#touch "${UDEV_OUTPUT_PATH}/60-xdma.rules"
 
 #clean file
 > ${UDEV_OUTPUT_PATH}/60-xdma.rules

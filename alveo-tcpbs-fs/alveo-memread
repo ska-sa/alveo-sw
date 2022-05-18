@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#the inform must have the same name as the process for tcpbs to "catch" it
+
+#set -v
+set -e
+set -x
+
+HEX=$(echo $1 | cut -f2 -d'x')
+
+#check if arg 1 is a hex value
+#let 16#${HEX} 2>/dev/null || exit -3
+test ${HEX} -eq 0 2>/dev/null || let 16#${HEX} 2>/dev/null
+
+#first have to identify which tcpborphserver called this funtion
+#because we need to get the associated pci address
+
+PARENT_PID=$(ps -fp $PPID | awk "/$PPID/"' { print $2 } ')
+#PARENT_PID=10823
+#kcpmsg "${PARENT_PID}"
+
+ARGS=$(ps -o args -p ${PARENT_PID})
+#kcpmsg "${ARGS}"
+
+#TODO the line below has a potential bug - if the process
+#was started without a space before the arg, this may lead to issue with cut's space delimiter
+#check this i.e. there will be no space e.g. -d/dev/...
+DEVICE=$(echo ${ARGS#*"-d"} | xargs | cut -d ' ' -f1)
+
+#kcpmsg "${DEVICE}"
+
+
+
+OUTPUT=$(pcimem ${DEVICE} $1 w 2>/dev/null)
+
+DATA=$(echo ${OUTPUT} | awk 'END{print}' | tr -d ' ' | cut -f2 -d':')
+
+test -n "${DATA}" || exit -1
+
+echo "#alveo-memread $1 ${DATA}"
+exit 0 
+

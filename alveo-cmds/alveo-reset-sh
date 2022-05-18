@@ -34,7 +34,7 @@ if test -z $pci_addr; then
 	print_usage_exit
 fi
 
-
+test -e /sys/bus/pci/devices/${pci_addr} || echo "no pcie at ${pci_addr}"
 
 #test -e /sys/bus/pci/devices/0000:0f:00.0/remove && echo 1 > /sys/bus/pci/devices/0000:0f:00.0/remove && sleep 1 && echo 1 > /sys/bus/pci/rescan
 test -e /sys/bus/pci/devices/${pci_addr}/remove && echo 1 > /sys/bus/pci/devices/${pci_addr}/remove && sleep 1 && echo 1 > /sys/bus/pci/rescan
