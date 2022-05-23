@@ -1,0 +1,10 @@
+#RvW, 2022, SARAO
+
+[Unit]
+Description=Launch tcpborphserver instances for all detected Alveo cards (with SARAO bsp running).
+
+[Service]
+#forking type NB here so the tcpbs process doesn't go away
+Type=forking
+ExecStart=/opt/alveo/alveo-utils/alveo-launch-tcpbs
+ExecStop=/opt/alveo/alveo-utils/alveo-stop-tcpbs

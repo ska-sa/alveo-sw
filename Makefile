@@ -2,6 +2,7 @@ ALVEOPATH="/opt/alveo/"
 TBSFS="${ALVEOPATH}/alveo-tcpbs-fs/"
 ALVEOUTILS="${ALVEOPATH}/alveo-utils/"
 UDEVPATH="/etc/udev/rules.d/"
+SYSTEMDPATH="/etc/systemd/system/"
 PREFIX=usr/local
 EXISTS=$(shell test -e ./alveo-linux-env/xdma-udev-rules/60-xdma.rules || echo 'NO')
 
@@ -11,6 +12,7 @@ install: .check .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .pcimem
 	cp -i ./alveo-linux-env/xdma-udev-rules/60-xdma.rules ./alveo-linux-env/xdma-udev-rules/alveo_namer.sh ${UDEVPATH}
 	@test -d ${ALVEOUTILS} || mkdir -p ${ALVEOUTILS}
 	cp -i ./alveo-utils/* ${ALVEOUTILS}
+	cp -i ./alveo-linux-env/systemd-services/tcpbs.service ${SYSTEMDPATH}
 
 .check: .FORCE
 ifeq ("$(EXISTS)","NO")

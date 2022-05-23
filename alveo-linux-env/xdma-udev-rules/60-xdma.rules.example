@@ -8,6 +8,8 @@
 KERNEL=="xdma[0-9]*", KERNELS=="0000:0f:00.0", PROGRAM="/etc/udev/rules.d/alveo_namer.sh %k", SYMLINK+="xdma/u50_0/%c",  MODE="0666"
 #only need to do the following actions one, so only perform on xdma*_user invocation
 KERNEL=="xdma[0-9]_user", KERNELS=="0000:0f:00.0", ACTION=="add", RUN+="/bin/ln -f -s /sys/bus/pci/devices/0000:0f:00.0/ /dev/xdma/u50_0/pci"
+#can only have one program per 'RUN' directive, either need "lazy evaluation" ie '&&' or another separate 'RUN'
+#KERNEL=="xdma[0-9]_user", KERNELS=="0000:0f:00.0", ACTION=="add", RUN+="/usr/bin/sudo systemctl start tcpbs.service"
 KERNEL=="xdma[0-9]_user", KERNELS=="0000:0f:00.0", ACTION=="remove", RUN+="/bin/rm /dev/xdma/u50_0/pci"
 
 

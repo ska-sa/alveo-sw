@@ -44,6 +44,10 @@ for PCIE_ADDR in ${DEVS}; do
   INDEX=$((INDEX+1))
 done
 
+echo >&3
+echo "#all alveos" >&3
+echo "KERNEL==\"xdma\[0-9\]_user\", ACTION==\"add\", RUN+=\"/usr/bin/sudo systemctl start tcpbs.service\"" >&3
+
 
 UDEV_OUTPUT_PATH=./alveo-linux-env/xdma-udev-rules
 test -e ${UDEV_OUTPUT_PATH}/60-xdma.rules && cp --backup=t ${UDEV_OUTPUT_PATH}/60-xdma.rules ${UDEV_OUTPUT_PATH}/60-xdma.rules.bak
