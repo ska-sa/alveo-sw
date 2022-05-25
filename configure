@@ -28,10 +28,12 @@ for PCIE_ADDR in ${DEVS}; do
   DEV_ID=$(cat /sys/bus/pci/devices/${PCIE_ADDR}/device 2>/dev/null)
   if test ${DEV_ID} = "0x5020"; then
     ALVEO_TYPE="u50";
+  elif test ${DEV_ID} = "0x9031"; then		#current SARAO bsp builds for u50
+    ALVEO_TYPE="u50";
   elif test ${DEV_ID} = "0x500c"; then
     ALVEO_TYPE="u280";
   else
-    ALVEO_TYPE="alveo";
+    ALVEO_TYPE="unknown";
   fi
 
   echo " ${ALVEO_TYPE}"

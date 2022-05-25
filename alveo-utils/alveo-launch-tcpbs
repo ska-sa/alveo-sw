@@ -27,7 +27,7 @@ PORT=${BASE_PORT}
 
 for CARD in ${ALVEOS}; do
 #  PCIADDR=$(echo ${CARD} | cut -d'/' -f1)
-  SERIAL=$(./alveo-serial /dev/xdma/${CARD}/user 2>/dev/null)
+  SERIAL=$(opt/alveo/alveo-utils/alveo-serial /dev/xdma/${CARD}/user 2>/dev/null)
   echo $CARD $SERIAL
 
   #check if this tcpbs already running, since with each xdma.ko load, this script will be run
