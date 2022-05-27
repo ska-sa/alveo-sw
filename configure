@@ -30,6 +30,8 @@ for PCIE_ADDR in ${DEVS}; do
     ALVEO_TYPE="u50";
   elif test ${DEV_ID} = "0x9031"; then		#current SARAO bsp builds for u50
     ALVEO_TYPE="u50";
+  elif test ${DEV_ID} = "0x9021"; then		#current SARAO bsp builds for u50
+    ALVEO_TYPE="u50";
   elif test ${DEV_ID} = "0x500c"; then
     ALVEO_TYPE="u280";
   else
