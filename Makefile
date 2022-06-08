@@ -40,7 +40,7 @@ endif
 
 xdma_mod_install:
 	${MAKE} -C dma_ip_drivers/XDMA/linux-kernel/xdma install
-	depmod -a
+	/usr/bin/sudo depmod -a
 
 uninstall: .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
 	$(RM) ${TBSFS}/*
