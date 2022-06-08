@@ -31,7 +31,7 @@ endif
 .katcp_install:
 	${MAKE} -C katcp/katcp/
 
-pcimem_install:
+.pcimem_install:
 	${MAKE} -C pcimem/
 	install pcimem/pcimem /usr/local/bin/
 
