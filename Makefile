@@ -13,6 +13,7 @@ install: .check .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .pcimem
 	@test -d ${ALVEOUTILS} || mkdir -p ${ALVEOUTILS}
 	cp -i ./alveo-utils/* ${ALVEOUTILS}
 	cp -i ./alveo-linux-env/systemd-services/tcpbs.service ${SYSTEMDPATH}
+	cp -i ./alveo-linux-env/modprobe-configs/xdma.conf /etc/modprobe.d/xdma.conf
 	install -D ./alveo_program/program-alveo  ${ALVEOPATH}/alveo_program/program-alveo
 	install -D ./alveo_program/program_alveo.tcl ${ALVEOPATH}/alveo_program/program_alveo.tcl
 
