@@ -26,7 +26,7 @@ endif
 
 .kcpfpg_install: .katcp_install
 	prefix=${PREFIX} ${MAKE} -C katcp/fpg install
-	ln -s /usr/local/bin/kcpfpg /bin/kcpfpg
+	ln -sf /usr/local/bin/kcpfpg /bin/kcpfpg
 
 .kcpcmd_install: .katcp_install
 	prefix=${PREFIX} ${MAKE} -C katcp/cmd install
