@@ -42,8 +42,14 @@ endif
 	${MAKE} -C katcp/msg install
 
 xdma_mod_install:
-	${MAKE} -C dma_ip_drivers/XDMA/linux-kernel/xdma install
-	/usr/bin/sudo depmod -a
+	#${MAKE} -C dma_ip_drivers/XDMA/linux-kernel/xdma install
+	#/usr/bin/sudo depmod -a
+	test -d /usr/src/xdma-2020.2.2 || mkdir /usr/src/xdma-2020.2.2
+	cp -r dma_ip_drivers/XDMA/linux-kernel/* /usr/src/xdma-2020.2.2
+	cp alveo-linux-env/xdma-dkms/dkms.conf /usr/src/xdma-2020.2.2/.
+	dkms add -m xdma -v 2020.2.2
+	dkms build -m xdma -v 2020.2.2
+	dkms install -m xdma -v 2020.2.2
 	cp -i ./alveo-linux-env/modprobe-configs/xdma.conf /etc/modprobe.d/xdma.conf
 
 uninstall: .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
