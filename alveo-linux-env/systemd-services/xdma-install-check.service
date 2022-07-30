@@ -1,0 +1,22 @@
+#RvW, SARAO, 2022
+
+#This service runs once at startup to ensure that the xdma
+#kernel module is installed. This is particularly of use
+#after the kernel updates since the xdma driver is an
+#out-of-tree module
+
+[Unit]
+Description=Check that the xdma kernel module is installed
+ConditionPathExists=/usr/src/xdma-2020.2.2
+
+[Service]
+Type=oneshot
+ExecStart=/usr/src/xdma-2020.2.2/install-xdma.sh
+TimeoutSec=0
+#if next line commented out, service output is written to syslog
+#StandardOutput=tty
+#RemainAfterExit=yes
+#SysVStartPriority=99
+
+[Install]
+WantedBy=multi-user.target
