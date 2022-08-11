@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#RvW, SARAO, 2022
+
 SRC_DEV="xdma.*user|xclmgmt"
 
 test ! -e configure && echo "run from ./configure location" && exit

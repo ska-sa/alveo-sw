@@ -1,6 +1,8 @@
 #!/usr/bin/sudo bash
 #NOTE: cannot call this utility 'reset', that already exists as a bash utility 
 
+#RvW, SARAO, 2022
+
 set -e
 
 #first have to identify which tcpborphserver called this funtion
