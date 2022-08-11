@@ -1,39 +1,51 @@
 # Created on: 12 April 2022
 # Author: Mathews Chirindo
 #
-# This script is started from tcpborphserver as a subprocess. It should only be run on hfghost1 server
-# (at least at the moment) wherein the JTAG programming cables should be fived to their corresponding
-# alveo cards
-#
+# Modified: RvW, SARAO, 2022
 
-# create a dictinary (lookup) for PCI IDs and JTAG cable serial numbers
-set lookup [dict create PCI_ID "JTAG" 0000:c1:00.0 "500202A20EDA" 0000:81:00.0 "21770297400J"]
+
+# create two lookup structures for mapping the jtag serial number and port number to the pci addr
+set lookup_jtag [dict create pci jtag]
+set lookup_port [dict create pci port]
+
+#open the config mapping file
+set fp [open "alveo-pci-cfg" r]
+
+#split the file data into lines
+set data [split [read $fp] "\n"]
+
+close $fp
+
+#for each line
+foreach line $data {
+  if { [string length $line] != 0 } {
+    #split into columns
+    set cols [split $line " "]
+    #puts "[lindex $cols 0]"
+    #puts "[lindex $cols 1]"
+    #puts "[lindex $cols 2]"
+    dict append lookup_jtag [lindex $cols 0] [lindex $cols 1]
+    dict append lookup_port [lindex $cols 0] [lindex $cols 2]
+  }
+}
+
+puts $lookup_jtag
+puts $lookup_port
+
+if { [dict exists $lookup_jtag $argv] != 1 ||  [dict exists $lookup_port $argv] != 1  } {
+  puts "Invalid PCI ID [lindex $argv 0]"
+  exit 2
+}
+
+set jtag_serial_number [dict get $lookup_jtag [lindex $argv 0]]
+set port_number [dict get $lookup_port [lindex $argv 0]]
+append url localhost: $port_number /xilinx_tcf/Xilinx/ $jtag_serial_number A
+puts $url
 
 open_hw_manager
-switch [lindex $argv 0] {
-    # PCI ID: 0000:c1:00.0
-     0000:c1:00.0 {
-           exec hw_server -d -s tcp:localhost:3150 -p0 -I20
-           connect_hw_server -url localhost:3150
-	   set jtag_serial_number [dict get $lookup [lindex $argv 0]]
-	   append jtag_serial_number "A"
-	   append url "localhost:3150/xilinx_tcf/Xilinx/" $jtag_serial_number
-           open_hw_target $url
-     }
-     # PCI ID: 0000:81:00.0
-     0000:81:00.0 {
-           exec hw_server -d -s tcp:localhost:3160 -p0 -I20
-           connect_hw_server -url localhost:3160
-	   set jtag_serial_number [dict get $lookup [lindex $argv 0]]
-	   append jtag_serial_number "A"
-	   append url "localhost:3160/xilinx_tcf/Xilinx/" $jtag_serial_number
-           open_hw_target url
-     }
-         default {
-             puts "Invalid PCI ID, [lindex $argv 0]"
-             exit 2
-     }
-}
+exec hw_server -d -s tcp:localhost:$port_number -p0 -I20
+connect_hw_server -url localhost:$port_number
+open_hw_target $url
 current_hw_device [lindex [get_hw_devices] 0]
 refresh_hw_device -update_hw_probes false [current_hw_device]
 # set_property PARAM.FREQUENCY 10000000 [current_hw_target]
