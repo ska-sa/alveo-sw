@@ -28,6 +28,7 @@ install: .check .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .pcimem
 	#install alveo programming scripts
 	install -D ./alveo-program/alveo-program.sh  ${ALVEOPATH}/alveo-program/alveo-program.sh
 	install -D ./alveo-program/alveo-program.tcl ${ALVEOPATH}/alveo-program/alveo-program.tcl
+	install -D ./alveo-program/alveo-pci-cfg ${ALVEOPATH}/alveo-program/alveo-pci-cfg
 
 .check: .FORCE
 ifeq ("$(EXISTS)","NO")

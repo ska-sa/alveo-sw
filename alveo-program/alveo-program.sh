@@ -9,4 +9,11 @@
 # $1 - the PCI address of the alveo card (use 'lspci -D -d 10ee: -vv' to get this)
 # $2 - the .bit file to upload to the alveo
 
+kcpmsg "about to launch vivado - see $(pwd)/vivado.log for issues"
+
 /opt/Xilinx/Vivado/2021.1/bin/vivado -mode batch -source alveo-program.tcl -tclargs $1 $2
+
+RET=$?
+
+kcpmsg "vivado exited with code ${RET}"
+exit ${RET}

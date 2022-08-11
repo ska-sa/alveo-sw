@@ -23,11 +23,20 @@ DEVPATH=${DEVICE%"user"}
 PCIPATH=$(readlink -f ${DEVPATH}/pci)
 
 PCIADDR=$(echo ${PCIPATH} | rev | cut -d '/' -f1 | rev)
-BITFILE="/lib/firmware/tcpborphserver.bit"
-kcpmsg "about to program alveo at ${PCIADDR} with ${BITFILE}"
+
+#assuming file visible with ?listbof
+BITFILE="$1"
+if test -z ${BITFILE}; then
+  BITFILE="tcpborphserver.bit";
+  BITPATH="/lib/firmware"
+else
+  BITPATH="/opt/alveo/alveo-tcpbs-fs"
+fi
+
+kcpmsg "about to program alveo at ${PCIADDR} with ${BITFILE} in ${BITPATH}"
 
 cd /opt/alveo/alveo-program/
 
-./alveo-program.sh ${PCIADDR} ${BITFILE}
+./alveo-program.sh ${PCIADDR} ${BITPATH}/${BITFILE}
 
 cd -
