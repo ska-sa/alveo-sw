@@ -32,7 +32,7 @@ foreach line $data {
 puts $lookup_jtag
 puts $lookup_port
 
-if { [dict exists $lookup_jtag $argv] != 1 ||  [dict exists $lookup_port $argv] != 1  } {
+if { [dict exists $lookup_jtag [lindex $argv 0]] != 1 ||  [dict exists $lookup_port [lindex $argv 0]] != 1  } {
   puts "Invalid PCI ID [lindex $argv 0]"
   exit 2
 }
@@ -49,5 +49,6 @@ open_hw_target $url
 current_hw_device [lindex [get_hw_devices] 0]
 refresh_hw_device -update_hw_probes false [current_hw_device]
 # set_property PARAM.FREQUENCY 10000000 [current_hw_target]
-set_property PROGRAM.FILE /lib/firmware/tcpborphserver.bit [current_hw_device]
+puts "will attempt to program alveo with [lindex $argv 1]"
+set_property PROGRAM.FILE [lindex $argv 1] [current_hw_device]
 program_hw_devices [current_hw_device]
