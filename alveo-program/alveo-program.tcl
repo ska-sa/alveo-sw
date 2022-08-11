@@ -37,6 +37,11 @@ if { [dict exists $lookup_jtag [lindex $argv 0]] != 1 ||  [dict exists $lookup_p
   exit 2
 }
 
+if { [file exists [lindex $argv 1]] != 1 } {
+  puts "Cannot access [lindex $argv 1]"
+  exit 3
+}
+
 set jtag_serial_number [dict get $lookup_jtag [lindex $argv 0]]
 set port_number [dict get $lookup_port [lindex $argv 0]]
 append url localhost: $port_number /xilinx_tcf/Xilinx/ $jtag_serial_number A
