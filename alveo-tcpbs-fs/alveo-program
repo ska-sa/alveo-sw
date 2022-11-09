@@ -1,5 +1,7 @@
 #!/usr/bin/sudo bash
 
+#RvW, SARAO, 2022
+
 set -e
 
 #first have to identify which tcpborphserver called this funtion
@@ -21,10 +23,20 @@ DEVPATH=${DEVICE%"user"}
 PCIPATH=$(readlink -f ${DEVPATH}/pci)
 
 PCIADDR=$(echo ${PCIPATH} | rev | cut -d '/' -f1 | rev)
-kcpmsg "about to program alveo at ${PCIADDR} with /lib/firmware/tcpborphserver.bit"
 
-cd /opt/alveo/alveo_program/
+#assuming file visible with ?listbof
+BITFILE="$1"
+if test -z ${BITFILE}; then
+  BITFILE="tcpborphserver.bit";
+  BITPATH="/lib/firmware"
+else
+  BITPATH="/opt/alveo/alveo-tcpbs-fs"
+fi
 
-./program-alveo ${PCIADDR}
+kcpmsg "about to program alveo at ${PCIADDR} with ${BITFILE} in ${BITPATH}"
+
+cd /opt/alveo/alveo-program/
+
+./alveo-program.sh ${PCIADDR} ${BITPATH}/${BITFILE}
 
 cd -

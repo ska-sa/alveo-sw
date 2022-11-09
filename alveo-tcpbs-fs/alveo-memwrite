@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#RvW, SARAO, 2022
+
 #the inform must have the same name as the process for tcpbs to "catch" it
 
 set -x

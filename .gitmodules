@@ -10,6 +10,3 @@
 [submodule "alveo_sensmon"]
 	path = alveo_sensmon
 	url = https://github.com/mchirindo/alveo_sensmon.git
-[submodule "alveo_program"]
-	path = alveo_program
-	url = https://github.com/mchirindo/alveo_program.git

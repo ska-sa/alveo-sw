@@ -1,3 +1,5 @@
+#RvW, SARAO, 2022
+
 ALVEOPATH="/opt/alveo/"
 TBSFS="${ALVEOPATH}/alveo-tcpbs-fs/"
 ALVEOUTILS="${ALVEOPATH}/alveo-utils/"
@@ -24,8 +26,9 @@ install: .check .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .pcimem
 	#install modprobe config
 	cp -i ./alveo-linux-env/modprobe-configs/xdma.conf /etc/modprobe.d/xdma.conf
 	#install alveo programming scripts
-	install -D ./alveo_program/program-alveo  ${ALVEOPATH}/alveo_program/program-alveo
-	install -D ./alveo_program/program_alveo.tcl ${ALVEOPATH}/alveo_program/program_alveo.tcl
+	install -D ./alveo-program/alveo-program.sh  ${ALVEOPATH}/alveo-program/alveo-program.sh
+	install -D ./alveo-program/alveo-program.tcl ${ALVEOPATH}/alveo-program/alveo-program.tcl
+	install -D ./alveo-program/alveo-pci-cfg ${ALVEOPATH}/alveo-program/alveo-pci-cfg
 
 .check: .FORCE
 ifeq ("$(EXISTS)","NO")
