@@ -48,7 +48,7 @@ append url localhost: $port_number /xilinx_tcf/Xilinx/ $jtag_serial_number A
 puts $url
 
 open_hw_manager
-exec hw_server -d -s tcp:localhost:$port_number -p0 -I20
+exec hw_server -d -s tcp:localhost:$port_number -p0 -I1
 connect_hw_server -url localhost:$port_number
 open_hw_target $url
 current_hw_device [lindex [get_hw_devices] 0]
