@@ -71,3 +71,7 @@ while read -u 4 line;do echo "$line" >> ${UDEV_OUTPUT_PATH}/60-xdma.rules;done
 exec 3>&-
 exec 4>&-
 
+echo "configuring pci to jtag-serial map...this may take a few minutes..."
+cd alveo-utils
+./alveo-jtag-list | grep "^>" | cut -d'>' -f 2 > ../alveo-program/alveo-pci-cfg
+cd - >/dev/null

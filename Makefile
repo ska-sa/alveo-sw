@@ -59,7 +59,7 @@ xdma_mod_install:
 	${MAKE} -C dma_ip_drivers/XDMA/linux-kernel/xdma install
 	${MAKE} -C dma_ip_drivers/XDMA/linux-kernel/xdma clean
 	depmod -a
-	insmod /lib/modules/$(shell uname -r)/extra/xdma.ko
+	modprobe xdma || insmod /lib/modules/$(shell uname -r)/extra/xdma.ko
 	#test -d /usr/src/xdma-2020.2.2 || mkdir /usr/src/xdma-2020.2.2
 	#cp -r dma_ip_drivers/XDMA/linux-kernel/* /usr/src/xdma-2020.2.2
 	#cp alveo-linux-env/xdma-dkms/dkms.conf /usr/src/xdma-2020.2.2/.

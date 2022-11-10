@@ -1,0 +1,89 @@
+#!/bin/bash
+
+#JTAG=$(lsusb -d 0403:6011 -v 2>/dev/null | grep iSerial | tr -s ' ' | rev | cut -f1 -d' ' | rev)
+
+#find an open port
+#read lower upper < /proc/sys/net/ipv4/ip_local_port_range
+#
+#while :; do
+#    for (( port = lower ; port <= upper ; port++ )); do
+#        lsof -i:${port} || break 2
+#    done
+#done
+#
+
+#JTAG="500202A3099A"
+port=3170
+
+echo "Reading DNA via JTAG...please wait, this may take a few minutes"
+
+JTAG=$(lsusb -d 0403: -v | grep -i serial | rev | cut -d' ' -f1 | rev)
+
+#echo ${port}
+
+declare -a dna_jtag
+declare -a serial_jtag
+declare -a port_arr
+index=0
+
+for j in ${JTAG}; do
+	#echo ${port}
+	#echo ${j}
+	serial_jtag[$index]=${j}
+	dna=$(/opt/Xilinx/Vivado/2021.1/bin/vivado -mode batch -source alveo-jtag-dna.tcl -tclargs $j $port | grep "^DNA read")
+	echo JTAG ${j} PORT ${port} ${dna}
+	dna_jtag[$index]=$(echo ${dna: -8})
+	port_arr[$index]=${port}
+	port=$((port+10))
+	index=$((index+1))
+done
+
+declare -a dna_pci
+declare -a pci
+index=0
+
+for i in $(ls /dev/xdma/); do
+	#u=$(ls -l /dev/xdma/$i | grep -o xdma.*user)
+	pci[$index]=$(ls -l /dev/xdma/$i | grep pci | rev | cut -f2 -d'/' | rev)
+	dna=$(pcimem /dev/xdma/$i/user 0x60000 w | tail -n1 | cut -d':' -f2 | tr -d ' ')
+	dna_pci[$index]=$(echo ${dna: -8})
+	index=$((index+1))
+done
+
+echo " dna via pci: ${dna_pci[*]}"
+echo "         pci: ${pci[*]}"
+echo "dna via jtag: ${dna_jtag[*]}"
+echo " jtag serial: ${serial_jtag[*]}"
+echo "        port: ${port_arr[*]}"
+
+#index=0
+#for k in ${dna_pci[*]}; do
+#	l=0
+#	for l in ${dna_jtag[*]}; do
+#		if test $k=$l; then
+#			echo $k
+#		fi
+#	done
+#done
+
+index_pci=0
+index_jtag=0
+
+echo -e "config:\n-------"
+
+for k in ${dna_pci[*]}; do
+	index_jtag=0
+	for l in ${dna_jtag[*]}; do
+		if [ $l = $k ]; then
+			#echo $k
+			#echo ${pci[$index_pci]}
+			#echo ${dna_jtag[index_jtag]}
+			#echo ${dna_pci[index_pci]}
+			#echo ${port_arr[index_jtag]}
+			#echo ${serial_jtag[index_jtag]}
+			echo ">${pci[$index_pci]} ${serial_jtag[index_jtag]} ${port_arr[index_jtag]}"
+		fi
+		index_jtag=$((index_jtag+1))
+	done
+	index_pci=$((index_pci+1))
+done
