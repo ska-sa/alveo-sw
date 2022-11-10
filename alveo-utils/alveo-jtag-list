@@ -81,7 +81,7 @@ for k in ${dna_pci[*]}; do
 			#echo ${dna_pci[index_pci]}
 			#echo ${port_arr[index_jtag]}
 			#echo ${serial_jtag[index_jtag]}
-			echo ${pci[$index_pci]} ${serial_jtag[index_jtag]} ${port_arr[index_jtag]} 
+			echo ">${pci[$index_pci]} ${serial_jtag[index_jtag]} ${port_arr[index_jtag]}"
 		fi
 		index_jtag=$((index_jtag+1))
 	done
