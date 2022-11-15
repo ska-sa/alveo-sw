@@ -48,6 +48,8 @@ append url localhost: $port_number /xilinx_tcf/Xilinx/ $jtag_serial_number A
 puts $url
 
 open_hw_manager
+#prevent chipscope server from launching
+set_param labtools.enable_cs_server false
 exec hw_server -d -s tcp:localhost:$port_number -p0 -I1
 connect_hw_server -url localhost:$port_number
 open_hw_target $url
