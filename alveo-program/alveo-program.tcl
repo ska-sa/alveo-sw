@@ -50,7 +50,8 @@ puts $url
 open_hw_manager
 #prevent chipscope server from launching
 set_param labtools.enable_cs_server false
-exec hw_server -d -s tcp:localhost:$port_number -p0 -I1
+append logfile hwserver- $jtag_serial_number - $port_number
+exec hw_server -d -L $logfile -s tcp:localhost:$port_number -p0 -I1
 connect_hw_server -url localhost:$port_number
 open_hw_target $url
 current_hw_device [lindex [get_hw_devices] 0]
