@@ -24,10 +24,11 @@ PCIPATH=$(readlink -f ${DEVPATH}/pci)
 
 PCIADDR=$(echo ${PCIPATH} | rev | cut -d '/' -f1 | rev)
 
+PCITAG=${PCIADDR//[:.]/-}
 #assuming file visible with ?listbof
 BITFILE="$1"
 if test -z ${BITFILE}; then
-  BITFILE="tcpborphserver.bit";
+  BITFILE="tcpborphserver-${PCITAG}.bit";
   BITPATH="/lib/firmware"
 else
   BITPATH="/opt/alveo/alveo-tcpbs-fs"
