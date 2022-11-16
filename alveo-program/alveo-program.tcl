@@ -51,7 +51,9 @@ open_hw_manager
 #prevent chipscope server from launching
 set_param labtools.enable_cs_server false
 append logfile hwserver- $jtag_serial_number - $port_number
-exec hw_server -d -L $logfile -s tcp:localhost:$port_number -p0 -I1
+#hw_server requires an 'A' to be appended to serial number obtained from 'lsusb -v'
+append jtag_extended_serial ${jtag_serial_number} A
+exec hw_server -d -L $logfile -s tcp:localhost:$port_number -p0 -I1 -e "set jtag-port-filter ${jtag_extended_serial}"
 connect_hw_server -url localhost:$port_number
 open_hw_target $url
 current_hw_device [lindex [get_hw_devices] 0]
