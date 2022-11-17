@@ -13,7 +13,7 @@ which kcpfpg || (>&2 echo "missing dependencies - kcpfpg"; exit 1)
 test -d /opt/alveo/alveo-tcpbs-fs/ || (>&2 echo "missing dependencies - /opt/alveo/alveo-tcpbs-fs/"; exit 1)
 
 BASE_PORT=7150
-BOF_DIR="/opt/alveo/alveo-tcpbs-fs/"
+#BOF_DIR="/opt/alveo/alveo-tcpbs-fs/"
 #BOF_DIR="../alveo-tcpbs-fs/"
 #CFGPATH="/lib/firmware/tcpborphserver.bit"
 
@@ -34,6 +34,12 @@ for CARD in ${ALVEOS}; do
   PCIADDR=$(echo ${PCIPATH} | rev | cut -d '/' -f1 | rev)
   PCITAG=${PCIADDR//[:.]/-}   #replace all ':' and '.' with '-'
   CFGPATH="/lib/firmware/tcpborphserver-${PCITAG}.bit"
+
+  BOF_DIR="/tmp/alveo-tcpbs-fs-${PCITAG}/"
+  if ! test -d ${BOF_DIR}; then
+    mkdir ${BOF_DIR}
+    cp /opt/alveo/alveo-tcpbs-fs/alveo-* ${BOF_DIR}
+  fi
 
   #check if this tcpbs already running, since with each xdma.ko load, this script will be run
   STAT=0
