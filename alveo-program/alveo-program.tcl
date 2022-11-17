@@ -50,7 +50,12 @@ puts $url
 open_hw_manager
 #prevent chipscope server from launching
 set_param labtools.enable_cs_server false
-append logfile hwserver- $jtag_serial_number - $port_number
+
+set systime [clock seconds]
+set timestring [clock format $systime -format "%d-%b-%H%M%S"]
+append logfile hwserver- $jtag_serial_number - $port_number - ${timestring} .log
+exec hwserver-log-rotate.sh ${jtag_serial_number} ${port_number}
+
 #hw_server requires an 'A' to be appended to serial number obtained from 'lsusb -v'
 append jtag_extended_serial ${jtag_serial_number} A
 exec hw_server -d -L $logfile -s tcp:localhost:$port_number -p0 -I1 -e "set jtag-port-filter ${jtag_extended_serial}"
