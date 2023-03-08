@@ -44,15 +44,15 @@ for PCIE_ADDR in ${DEVS}; do
 
   echo "#alveo_${INDEX}" >&3
   echo "KERNEL==\"xdma\[0-9\]*\", KERNELS==\"${PCIE_ADDR}\", PROGRAM=\"/etc/udev/rules.d/alveo_namer.sh %k\", SYMLINK+=\"xdma/alveo_${INDEX}_${ALVEO_TYPE}/%c\",  MODE=\"0666\"" >&3
-  echo "KERNEL==\"xdma\[0-9\]_user\", KERNELS==\"${PCIE_ADDR}\", ACTION==\"add\", RUN+=\"/bin/ln -f -s /sys/bus/pci/devices/${PCIE_ADDR}/ /dev/xdma/alveo_${INDEX}_${ALVEO_TYPE}/pci\"" >&3
-  echo "KERNEL==\"xdma\[0-9\]_user\", KERNELS==\"${PCIE_ADDR}\", ACTION==\"remove\", RUN+=\"/bin/rm /dev/xdma/alveo_${INDEX}_${ALVEO_TYPE}/pci\"" >&3
+  echo "KERNEL==\"xdma\[0-9\]*_user\", KERNELS==\"${PCIE_ADDR}\", ACTION==\"add\", RUN+=\"/bin/ln -f -s /sys/bus/pci/devices/${PCIE_ADDR}/ /dev/xdma/alveo_${INDEX}_${ALVEO_TYPE}/pci\"" >&3
+  echo "KERNEL==\"xdma\[0-9\]*_user\", KERNELS==\"${PCIE_ADDR}\", ACTION==\"remove\", RUN+=\"/bin/rm /dev/xdma/alveo_${INDEX}_${ALVEO_TYPE}/pci\"" >&3
   echo >&3
   INDEX=$((INDEX+1))
 done
 
 echo >&3
 echo "#all alveos" >&3
-echo "KERNEL==\"xdma\[0-9\]_user\", ACTION==\"add\", RUN+=\"/usr/bin/sudo systemctl start tcpbs.service\"" >&3
+echo "KERNEL==\"xdma\[0-9\]*_user\", ACTION==\"add\", RUN+=\"/usr/bin/sudo systemctl start tcpbs.service\"" >&3
 
 
 UDEV_OUTPUT_PATH=./alveo-linux-env/xdma-udev-rules

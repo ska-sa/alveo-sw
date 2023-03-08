@@ -29,6 +29,7 @@ install: .check .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .pcimem
 	install -D ./alveo-program/alveo-program.sh  ${ALVEOPATH}/alveo-program/alveo-program.sh
 	install -D ./alveo-program/alveo-program.tcl ${ALVEOPATH}/alveo-program/alveo-program.tcl
 	install -D ./alveo-program/alveo-pci-cfg ${ALVEOPATH}/alveo-program/alveo-pci-cfg
+	install -D ./alveo-program/hwserver-log-rotate.sh ${ALVEOPATH}/alveo-program/hwserver-log-rotate.sh
 
 .check: .FORCE
 ifeq ("$(EXISTS)","NO")
