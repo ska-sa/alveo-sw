@@ -1,22 +1,23 @@
 #RvW, SARAO, 2022
 
 ALVEOPATH="/opt/alveo/"
-TBSFS="${ALVEOPATH}/alveo-tcpbs-fs/"
+#TBSFS="${ALVEOPATH}/alveo-tcpbs-fs/"
 ALVEOUTILS="${ALVEOPATH}/alveo-utils/"
 UDEVPATH="/etc/udev/rules.d/"
 SYSTEMDPATH="/etc/systemd/system/"
 PREFIX=usr/local
 EXISTS=$(shell test -e ./alveo-linux-env/xdma-udev-rules/60-xdma.rules || echo 'NO')
 
-install: .check .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .pcimem_install .kcpmsg_install xdma_mod_install
-	@test -d ${TBSFS} || mkdir -p ${TBSFS}
-	cp -i ./alveo-tcpbs-fs/* ${TBSFS}
+install: .check .alveo_katcp_svr_install .kcpfpg_install .kcpcmd_install .pcimem_install .kcpmsg_install xdma_mod_install
+#	@test -d ${TBSFS} || mkdir -p ${TBSFS}
+#	cp -i ./alveo-tcpbs-fs/* ${TBSFS}
 	cp -i ./alveo-linux-env/xdma-udev-rules/60-xdma.rules ./alveo-linux-env/xdma-udev-rules/alveo_namer.sh ${UDEVPATH}
 	#install alveo-utils
 	@test -d ${ALVEOUTILS} || mkdir -p ${ALVEOUTILS}
 	cp -i ./alveo-utils/* ${ALVEOUTILS}
 	#install tcpbs service
-	cp -i ./alveo-linux-env/systemd-services/tcpbs.service ${SYSTEMDPATH}
+#	cp -i ./alveo-linux-env/systemd-services/tcpbs.service ${SYSTEMDPATH}
+	cp -i ./alveo-linux-env/systemd-services/alveo-katcp-svr.service ${SYSTEMDPATH}
 	#install kernel module src and supporting build/service scripts
 	test -d /usr/src/xdma-2020.2.2 || mkdir /usr/src/xdma-2020.2.2
 	cp -r dma_ip_drivers/XDMA/linux-kernel/* /usr/src/xdma-2020.2.2
@@ -36,8 +37,12 @@ ifeq ("$(EXISTS)","NO")
 	$(error "First run ./configure to set up environment")
 endif
 
-.tcpborphserver3_install: .katcp_install
-	prefix=${PREFIX} ${MAKE} -C katcp/tcpborphserver3/ install
+#.tcpborphserver3_install: .katcp_install
+#	prefix=${PREFIX} ${MAKE} -C katcp/tcpborphserver3/ install
+
+.alveo_katcp_svr_install:
+	test -d ${ALVEOPATH}/alveo-katcp-svr || mkdir -p ${ALVEOPATH}/alveo-katcp-svr
+	cp ./alveo-katcp-svr/* ${ALVEOPATH}/alveo-katcp-svr/
 
 .kcpfpg_install: .katcp_install
 	prefix=${PREFIX} ${MAKE} -C katcp/fpg install
@@ -72,8 +77,8 @@ uninstall: .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
 	$(RM) ${TBSFS}/*
 	$(RM) ${ALVEOUTILS}/*
 
-.tcpborphserver3_uninstall:
-	prefix=${PREFIX} ${MAKE} -C katcp/tcpborphserver3/ uninstall
+#.tcpborphserver3_uninstall:
+#	prefix=${PREFIX} ${MAKE} -C katcp/tcpborphserver3/ uninstall
 
 .kcpfpg_uninstall:
 	prefix=${PREFIX} ${MAKE} -C katcp/fpg uninstall
@@ -85,6 +90,6 @@ uninstall: .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
 	prefix=${PREFIX} ${MAKE} -C katcp/msg uninstall
 
 
-.PHONY: .check .pcimem_install .katcp_install .tcpborphserver3_install .kcpfpg_install .kcpcmd_install .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
+.PHONY: .check .pcimem_install .katcp_install .kcpfpg_install .kcpcmd_install .kcpfpg_uninstall .kcpcmd_uninstall
 
 .FORCE:
