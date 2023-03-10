@@ -77,7 +77,7 @@ xdma_mod_install:
 	#dkms build -m xdma -v 2020.2.2
 	#dkms install -m xdma -v 2020.2.2
 
-uninstall: .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
+uninstall: .kcpfpg_uninstall .kcpcmd_uninstall .kcpmsg_uninstall
 	$(RM) ${TBSFS}/*
 	$(RM) ${ALVEOUTILS}/*
 
@@ -90,10 +90,10 @@ uninstall: .tcpborphserver3_uninstall .kcpfpg_uninstall .kcpcmd_uninstall
 .kcpcmd_uninstall:
 	prefix=${PREFIX} ${MAKE} -C katcp/cmd uninstall
 
-.kcpcmd_uninstall:
+.kcpmsg_uninstall:
 	prefix=${PREFIX} ${MAKE} -C katcp/msg uninstall
 
 
-.PHONY: .check .pcimem_install .katcp_install .kcpfpg_install .kcpcmd_install .kcpfpg_uninstall .kcpcmd_uninstall
+.PHONY: .check .alveo_katcp_svr_install .pcimem_install .katcp_install .kcpfpg_install .kcpmsg_install .kcpcmd_install .kcpfpg_uninstall .kcpcmd_uninstall .kcpmsg_uninstall
 
 .FORCE:
