@@ -42,7 +42,11 @@ endif
 
 .alveo_katcp_svr_install:
 	test -d ${ALVEOPATH}/alveo-katcp-svr || mkdir -p ${ALVEOPATH}/alveo-katcp-svr
-	cp ./alveo-katcp-svr/* ${ALVEOPATH}/alveo-katcp-svr/
+	cp ./alveo-katcp-svr/alveo-katcp-svr.py ${ALVEOPATH}/alveo-katcp-svr/.
+	cp ./alveo-katcp-svr/AlveoIO.py ${ALVEOPATH}/alveo-katcp-svr/.
+	cp ./alveo-katcp-svr/fpgparser.py ${ALVEOPATH}/alveo-katcp-svr/.
+	cp ./alveo-katcp-svr/alveo_env.pex ${ALVEOPATH}/alveo-katcp-svr/.
+
 
 .kcpfpg_install: .katcp_install
 	prefix=${PREFIX} ${MAKE} -C katcp/fpg install

@@ -8,17 +8,11 @@ echo "WARNING: starting with root permissions!!"
 
 BASE_PORT=7150
 
-#export PATH=$PATH:$(pwd)
-export PATH=$PATH:$(pwd):${BOF_DIR}
-
-#ALVEOS=$(./alveo-map)
 ALVEOS=$(ls /dev/xdma/)
 
 PORT=${BASE_PORT}
-#CARD="alveo_0_u50"
 
 for CARD in ${ALVEOS}; do
-#  PCIADDR=$(echo ${CARD} | cut -d'/' -f1)
   SERIAL=$(/opt/alveo/alveo-utils/alveo-serial /dev/xdma/${CARD}/user 2>/dev/null)
   echo $CARD $SERIAL
 
@@ -26,10 +20,9 @@ for CARD in ${ALVEOS}; do
   PCIADDR=$(echo ${PCIPATH} | rev | cut -d '/' -f1 | rev)
   PCITAG=${PCIADDR//[:.]/-}   #replace all ':' and '.' with '-'
 
-  BOF_DIR="/tmp/alveo-tcpbs-fs-${PCITAG}/"
+  BOF_DIR="/tmp/alveo-katcp-svr-fs-${PCITAG}/"
   if ! test -d ${BOF_DIR}; then
     mkdir ${BOF_DIR}
-#    cp /opt/alveo/alveo-tcpbs-fs/alveo-* ${BOF_DIR}
   fi
 
   #check if this tcpbs already running, since with each xdma.ko load, this script will be run
@@ -40,18 +33,18 @@ for CARD in ${ALVEOS}; do
   then
     echo "alveo-katcp-svr: instance already running for ${CARD} with serial ${SERIAL} at port ${PORT}"
   else
-    #env PATH=$PATH:$(pwd):${BOF_DIR} tcpborphserver3 -p ${PORT} -l /dev/null -b ${BOF_DIR} -d /dev/xdma/${CARD}/user -u $((PORT+1)) -c ${CFGPATH}
-#    env PATH=$PATH:$(pwd):${BOF_DIR} tcpborphserver3 -p ${PORT} -l ${BOF_DIR}/tcpbs-${CARD}-log -b ${BOF_DIR} -d /dev/xdma/${CARD}/user -u $((PORT+1)) -c ${CFGPATH}
-    /home/rvw/my_env_project/bin/python3 /home/rvw/py-katcp-test/alveo-katcp-svr.py --alveo ${CARD} --workdir ${BOF_DIR} --port ${PORT} --card ${CARD}-${SERIAL} -d
+    cd /opt/alveo/alveo-katcp-svr/
+    env PATH=${PATH}:/opt/alveo/alveo-katcp-svr/ \
+                  /opt/alveo/alveo-katcp-svr/alveo_env.pex /opt/alveo/alveo-katcp-svr/alveo-katcp-svr.py --alveo ${CARD} \
+                                                                                                         --workdir ${BOF_DIR} \
+                                                                                                         --port ${PORT} \
+                                                                                                         --card ${CARD}-${SERIAL} \
+                                                                                                         -d
+    cd -
+
 
     #TODO should we wait a bit here?
     sleep 0.5
-#    kcpcmd -s localhost:${PORT} version add alveo-card ${CARD}
-#    kcpcmd -s localhost:${PORT} version add alveo-serial ${SERIAL}
-#    kcpcmd -s localhost:${PORT} process alveo-reset reset\_this\_alveo
-#    kcpcmd -s localhost:${PORT} process alveo-program program\_this\_alveo
-#    kcpcmd -s localhost:${PORT} process alveo-memread read\_from\_a\_hex\_valued\_absolute\_address
-#    kcpcmd -s localhost:${PORT} process alveo-memwrite write\_to\_a\_hex\_valued\_absolute\_address
   fi
   PORT=$((PORT+2))
 done
