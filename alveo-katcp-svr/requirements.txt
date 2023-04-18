@@ -1,0 +1,3 @@
+git+https://github.com/ska-sa/aiokatcp@master#egg=aiokatcp
+numpy
+

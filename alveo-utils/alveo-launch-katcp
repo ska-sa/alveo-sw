@@ -1,0 +1,50 @@
+#!/usr/bin/sudo bash
+
+#RvW, SARAO, 2022
+
+set -e
+
+echo "WARNING: starting with root permissions!!"
+
+BASE_PORT=7150
+
+ALVEOS=$(ls /dev/xdma/)
+
+PORT=${BASE_PORT}
+
+for CARD in ${ALVEOS}; do
+  SERIAL=$(/opt/alveo/alveo-utils/alveo-serial /dev/xdma/${CARD}/user 2>/dev/null)
+  echo $CARD $SERIAL
+
+  PCIPATH=$(readlink -f /dev/xdma/${CARD}/pci)
+  PCIADDR=$(echo ${PCIPATH} | rev | cut -d '/' -f1 | rev)
+  PCITAG=${PCIADDR//[:.]/-}   #replace all ':' and '.' with '-'
+
+  BOF_DIR="/tmp/alveo-katcp-svr-fs-${PCITAG}/"
+  if ! test -d ${BOF_DIR}; then
+    mkdir ${BOF_DIR}
+  fi
+
+  #check if this tcpbs already running, since with each xdma.ko load, this script will be run
+  STAT=0
+  ps fax | grep [a]lveo-katcp-svr | grep ${PORT} &> /dev/null || STAT=1   #the || is so the process can continue (set -e)
+
+  if [ ${STAT} -ne 1 ]
+  then
+    echo "alveo-katcp-svr: instance already running for ${CARD} with serial ${SERIAL} at port ${PORT}"
+  else
+    cd /opt/alveo/alveo-katcp-svr/
+    env PATH=${PATH}:/opt/alveo/alveo-katcp-svr/ \
+                  /opt/alveo/alveo-katcp-svr/alveo_env.pex /opt/alveo/alveo-katcp-svr/alveo-katcp-svr.py --alveo ${CARD} \
+                                                                                                         --workdir ${BOF_DIR} \
+                                                                                                         --port ${PORT} \
+                                                                                                         --card ${CARD}-${SERIAL} \
+                                                                                                         -d
+    cd -
+
+
+    #TODO should we wait a bit here?
+    sleep 0.5
+  fi
+  PORT=$((PORT+2))
+done

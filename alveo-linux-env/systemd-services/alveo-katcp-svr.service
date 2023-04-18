@@ -1,0 +1,14 @@
+#RvW, 2023, SARAO
+
+[Unit]
+Description=Launch alveo-katcp-svr instances for all detected Alveo cards (with SARAO bsp running).
+After=multi-user.target
+
+[Service]
+#forking type NB here so the tcpbs process doesn't go away
+Type=forking
+ExecStart=/opt/alveo/alveo-utils/alveo-launch-katcp
+ExecStop=/opt/alveo/alveo-utils/alveo-stop-katcp
+
+[Install]
+WantedBy=multi-user.target

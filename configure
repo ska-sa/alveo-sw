@@ -52,7 +52,7 @@ done
 
 echo >&3
 echo "#all alveos" >&3
-echo "KERNEL==\"xdma\[0-9\]*_user\", ACTION==\"add\", RUN+=\"/usr/bin/sudo systemctl start tcpbs.service\"" >&3
+echo "KERNEL==\"xdma\[0-9\]*_user\", ACTION==\"add\", RUN+=\"/usr/bin/sudo systemctl start alveo-katcp-svr.service\"" >&3
 
 
 UDEV_OUTPUT_PATH=./alveo-linux-env/xdma-udev-rules
