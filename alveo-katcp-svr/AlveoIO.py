@@ -3,6 +3,7 @@ import numpy as np
 from time import sleep
 #from casperfpga import utils
 import fpgparser
+import AlveoSensors as sensors
 
 
 class _AlveoMemMap:
@@ -281,6 +282,11 @@ class AlveoUtils:
     def get_dsp_reg_offset(self):
         """getter to return the offset to dsp reg space on AXI bus (fixed at design time)"""
         return self.__DSP_BASE_OFFSET
+
+    @property
+    def get_alveo_sensor_map(self):
+        """getter to return the map of the sensors internal to the alveo"""
+        return sensors.alveo_sensor_map
 
 
     #public methods
