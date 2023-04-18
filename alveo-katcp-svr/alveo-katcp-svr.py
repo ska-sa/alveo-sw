@@ -7,7 +7,7 @@ import os
 import argparse
 import logging
 import numpy as np
-import sys
+import sys, subprocess
 
 from AlveoIO import AlveoUtils
 
@@ -18,8 +18,14 @@ PCIE_BAR_SIZE = 1 << 28
 
 class MyServer(aiokatcp.DeviceServer):
     
-    VERSION = 'myserver-api-1.0'
-    BUILD_STATE = 'myserver-1.0.1.dev0'
+    try:
+        commit = subprocess.check_output('./version.sh').decode()
+
+    except:
+        commit = 'unknown'
+
+    VERSION = 'serial-number-unknown'
+    BUILD_STATE = f'alveo-katcp-server-{commit}'
     #wd = os.path.abspath('.')
     #alveo = AlveoPcieUtils('alveo_0_u50', wd)
 
@@ -37,6 +43,9 @@ class MyServer(aiokatcp.DeviceServer):
         )
         self.sensors.add(sensor)
         self.VERSION = card
+
+        self._populate_sensors()
+        self.add_service_task(asyncio.create_task(self._sensor_update()))
 
 #        sensor = aiokatcp.Sensor(
 #            float,
@@ -61,6 +70,32 @@ class MyServer(aiokatcp.DeviceServer):
 #            self.sensors["uptime"].value = uptime_seconds
 
  
+    def _populate_sensors(self):
+        sensors = self.alveo.get_alveo_sensor_map
+        for idx in range(0,len(sensors)):
+            katcp_sensor = aiokatcp.Sensor(
+                int,
+                sensors[idx]['name'],
+                sensors[idx]['description'],
+                units=sensors[idx]['units'],
+                default=0,
+                initial_status=aiokatcp.Sensor.Status.NOMINAL,
+            )
+            self.sensors.add(katcp_sensor)
+
+
+    async def _sensor_update(self) -> None:
+        """Update the sensor values every second"""
+        #TODO: this is written fro demonstration purposes first, there may be
+        # a more performance efficient way to do this than single sensor updates
+        sensors = self.alveo.get_alveo_sensor_map
+        while True:
+            await asyncio.sleep(1)
+            for idx in range(0,len(sensors)):
+                value = self.alveo.wordread(sensors[idx]['address'], type_obj='int')
+                self.sensors[sensors[idx]['name']].value = value[0]
+
+
     async def request_greet(self, ctx, name: str) -> None:
         """Take a person's name and greet them"""
         ctx.inform(name)
